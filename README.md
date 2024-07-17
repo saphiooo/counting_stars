@@ -1,6 +1,6 @@
 # Counting Stars
 ## fits image practice + time series
-- mainly followign tutorials, did some experimentation
+- mainly following tutorials, did some experimentation
 
 ## counting stars in the horsehead nebula
 (same file tackling the same problem, but different verions saved; v1 = day 1, v2 = day 2, etc.)
