@@ -1,4 +1,9 @@
 # Counting Stars
+
+## todo
+- fix qq plots in counting_stars_v5 (they look wonky)
+- tackling new data from SWIFT UVOT
+
 ## fits image practice + time series
 - mainly following tutorials, did some experimentation
 
