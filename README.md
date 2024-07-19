@@ -7,7 +7,14 @@
 
 ## todo
 - fix qq plots in counting_stars_v5 (they look wonky)
-- time series from Swift UVOT
+- identift astronomical event in swift UVOT data
+
+## project work: swift UVOT data
+- extracted data, counted stars
+- floodfill to isolate stars
+- working on determining astronomical phenomenon in the data using time series
+  - using SNR ratio in the time domain to determine out-of-the-ordinary signals
+- a visualization code snippet is also included to visualize the histogram over time; could potentially be used later
 
 ## practice: fits image practice + time series
 - mainly following tutorials, did some experimentation
@@ -19,14 +26,10 @@
 - v3: annulus aperture 
 - v4: different kinds of annuli, tweaking the snr ratio calculations
 
-## project work: swift UVOT data
-- extracted data, counted stars
-- floodfill to isolate stars
-- working on determining astronomical phenomenon in the data using time series
-
 ## annulus folder
 - differently sized annuli that were used to test out the counting stars algorithm
 - number in file name indicates total height of the image in pixels
   - annulus 22 has a smaller circular aperture (2 pixels across)
+    - also used in the swift UVOT program code
   - annulus 31 has a larger circular aperture (5 pixels across)
   
