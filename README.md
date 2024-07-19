@@ -1,23 +1,25 @@
 # Counting Stars
 
 ## project overview
-- finding stars in real datasets to discover interesting things!
+- finding stars to discover interesting things!
+- using data from the Swift UVOT (ultraviolet optical telescope), this project aims to analyze stars that flare in the UV to determine characteristics about their activity, such as frequency
+- this can be used to inform conclusions about potential exoplanets around them
 
 ## todo
 - fix qq plots in counting_stars_v5 (they look wonky)
 - time series from Swift UVOT
 
-## fits image practice + time series
+## practice: fits image practice + time series
 - mainly following tutorials, did some experimentation
 
-## counting stars in the horsehead nebula
+## practice: counting stars in the horsehead nebula
 (same file tackling the same problem, but different verions saved; v1 = day 1, v2 = day 2, etc.)
 - v1: gradient analysis 
 - v2: using a circle 
 - v3: annulus aperture 
 - v4: different kinds of annuli, tweaking the snr ratio calculations
 
-## swift UVOT data
+## project work: swift UVOT data
 - extracted data, counted stars
 - floodfill to isolate stars
 - working on determining astronomical phenomenon in the data using time series
