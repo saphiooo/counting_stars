@@ -14,7 +14,9 @@
 - floodfill to isolate stars
 - working on determining astronomical phenomenon in the data using time series
   - using SNR ratio in the time domain to determine out-of-the-ordinary signals
-- a visualization code snippet is also included to visualize the histogram over time; could potentially be used later
+  - working on helper functions to easily access stars from different kinds of
+  inputs, and visualize stars in a time series for sanity checks
+- a visualization program is also included to visualize the histogram over time; could potentially be used later
 
 ## practice: fits image practice + time series
 - mainly following tutorials, did some experimentation
