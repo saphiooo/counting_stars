@@ -9,6 +9,14 @@
 - fix qq plots in counting_stars_v5 (they look wonky)
 - identift astronomical event in swift UVOT data
 
+## replicating this repo
+- install astropy in the command line: `sudo apt install python3-astropy`
+- install regions in the command line: `sudo apt install python3-regions`
+- clone as usual! once cloning, make the following changes:
+- image files: accessible from the folder "annuli_imgs"; replace the file
+read-in in the first cell under the "star finding" header
+- run notebook from top to bottom; do *not* skip any cells
+
 ## project work: swift UVOT data
 - extracted data, counted stars
 - floodfill to isolate stars
