@@ -10,7 +10,8 @@
 - identify astronomical event in swift UVOT data
 
 ## replicating this repo
-- install packages in the command line: ```
+- install packages in the command line:
+- ```
   sudo apt install python3-astropy
   sudo apt install python3-regions
   sudo apt install python3-photutils
@@ -19,8 +20,9 @@
 ```
 - python files of the jupyter notebooks are given in the repo, however
 you are also free to convert the notebooks to python files by yourself; type
-the following in the command line: ```
-sudo apt install jupyter-nbconvert
+the following in the command line:
+
+``` sudo apt install jupyter-nbconvert
 jupyter nbconvert --to script script notebook_name.ipynb
 ```
 - run programs as usual
