@@ -20,10 +20,9 @@
   ```
 - python files of the jupyter notebooks are given in the repo, however
 you are also free to convert the notebooks to python files by yourself; type
-the following in the command line:
-```
-sudo apt install jupyter-nbconvert
-jupyter nbconvert --to script script notebook_name.ipynb
+the following in the command line: ```
+  sudo apt install jupyter-nbconvert
+  jupyter nbconvert --to script script notebook_name.ipynb
 ```
 - run programs as usual
 - if using jupyter notebook, run the cells **in order**
