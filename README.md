@@ -23,7 +23,7 @@ you are also free to convert the notebooks to python files by yourself; type
 the following in the command line: ```
   sudo apt install jupyter-nbconvert
   jupyter nbconvert --to script script notebook_name.ipynb
-```
+  ```
 - run programs as usual
 - if using jupyter notebook, run the cells **in order**
 - necessary files are downloaded in the scripts; do not change file paths
