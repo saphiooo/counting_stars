@@ -16,8 +16,7 @@
   sudo apt install python3-regions
   sudo apt install python3-photutils
   sudo apt install python3-scipy
-  sudo apt install python3-wget 
-```
+  sudo apt install python3-wget ```
 - python files of the jupyter notebooks are given in the repo, however
 you are also free to convert the notebooks to python files by yourself; type
 the following in the command line:
