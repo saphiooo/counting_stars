@@ -7,15 +7,25 @@
 
 ## todo
 - fix qq plots in counting_stars_v5 (they look wonky)
-- identift astronomical event in swift UVOT data
+- identify astronomical event in swift UVOT data
 
 ## replicating this repo
-- install astropy in the command line: `sudo apt install python3-astropy`
-- install regions in the command line: `sudo apt install python3-regions`
-- clone as usual! once cloning, make the following changes:
-- image files: accessible from the folder "annuli_imgs"; replace the file
-read-in in the first cell under the "star finding" header
-- run notebook from top to bottom; do *not* skip any cells
+- install packages in the command line: ```
+  sudo apt install python3-astropy
+  sudo apt install python3-regions
+  sudo apt install python3-photutils
+  sudo apt install python3-scipy
+  sudo apt install python3-wget 
+```
+- python files of the jupyter notebooks are given in the repo, however
+you are also free to convert the notebooks to python files by yourself; type
+the following in the command line: ```
+sudo apt install jupyter-nbconvert
+jupyter nbconvert --to script script notebook_name.ipynb
+```
+- run programs as usual
+- if using jupyter notebook, run the cells **in order**
+- necessary files are downloaded in the scripts; do not change file paths
 
 ## project work: swift UVOT data
 - extracted data, counted stars
@@ -30,11 +40,8 @@ read-in in the first cell under the "star finding" header
 - mainly following tutorials, did some experimentation
 
 ## practice: counting stars in the horsehead nebula
-(same file tackling the same problem, but different verions saved; v1 = day 1, v2 = day 2, etc.)
-- v1: gradient analysis 
-- v2: using a circle 
-- v3: annulus aperture 
-- v4: different kinds of annuli, tweaking the snr ratio calculations
+- practicing extracting star data from an image, using the signal-to-noise
+ratio
 
 ## annulus folder
 - differently sized annuli that were used to test out the counting stars algorithm
