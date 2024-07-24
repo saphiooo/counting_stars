@@ -5,7 +5,7 @@
 
 # ## Reading in Data
 
-# In[3]:
+# In[2]:
 
 
 from astropy.io import fits
@@ -49,7 +49,7 @@ except:
     print('Error downloading files')
 
 
-# In[5]:
+# In[3]:
 
 
 ## Open files after downloading them locally. No need to change the file path.
@@ -65,13 +65,13 @@ wcs = WCS(imgHdu.header)
 events = eventFile[1].data
 
 
-# In[6]:
+# In[4]:
 
 
 print(events)
 
 
-# In[7]:
+# In[5]:
 
 
 print(wcs)
@@ -79,17 +79,56 @@ print(wcs)
 
 # ## Cleaning Event Data
 
-# In[8]:
+# In[6]:
 
 
-events_clean = events[np.where((events.QUALITY == 0))]
+events_good = events[np.where((events.QUALITY == 0))]
 ## quality flag of 0 = good
-print(f'removed {len(events) - len(events_clean)} events')
+print(f'removed {len(events) - len(events_good)} events')
+
+
+# In[113]:
+
+
+## Removing non-continuous data points (or floating chunks of data)
+
+events_good.sort()
+events_int = [tuple(events_good[0])]
+waiting_interval = []
+
+formats = events_good.dtype
+
+eStart = events_good['TIME'][0]
+eLast = events_good['TIME'][0]
+
+for i in range(1, len(events_good)):
+    eTime = events_good['TIME'][i]
+    if (eTime - eLast < 2):
+        # print('flag')
+        waiting_interval.append(tuple(events_good[i]))
+        eLast = eTime
+    else:
+        # print('flag 2')
+        ## end the interval
+        if (eTime - eStart > 80): ## interval is large
+            events_int += waiting_interval
+        waiting_interval = []
+        eStart = events_good['TIME'][i + 1]
+        eLast = events_good['TIME'][i + 1]
+            
+events_clean = np.array(events_int, dtype=formats)
+
+
+# In[116]:
+
+
+events_clean = events_clean.view(np.recarray)
+len(events_clean)
 
 
 # ## Displaying Event Data
 
-# In[9]:
+# In[117]:
 
 
 fig, ax = plt.subplots(figsize=(12, 10))
@@ -101,16 +140,16 @@ plt.colorbar()
 plt.show()
 
 
-# In[10]:
+# In[272]:
 
 
-times = plt.hist(events_clean['TIME'], bins='auto')
+times = plt.hist(events_clean['TIME'], bins=1000, log=True)
 plt.show()
 
 
 # ## Star-finding
 
-# In[11]:
+# In[119]:
 
 
 ## import annulus
@@ -119,7 +158,7 @@ im_frame = Image.open('annuli_imgs/annulus_22.png')
 ## these stars are smaller, so we use the smaller annulus
 
 
-# In[12]:
+# In[120]:
 
 
 np_frame = np.array(im_frame)
@@ -141,7 +180,7 @@ plt.show()
 
 # ### Signal to Noise Ratio
 
-# In[13]:
+# In[121]:
 
 
 ## signal-to-noise ratio function from counting_stars_v5
@@ -182,7 +221,7 @@ def calculate_ratio (testImg, x, y):
     return signal/total_noise
 
 
-# In[68]:
+# In[122]:
 
 
 testImg = histdata
@@ -190,7 +229,7 @@ plt.imshow(testImg, vmin=0, vmax=500)
 plt.show()
 
 
-# In[15]:
+# In[123]:
 
 
 snrImg = np.zeros(testImg.shape)
@@ -200,7 +239,7 @@ for i in range(-offset, len(testImg) - offset):
         snrImg[i + offset, j + offset] = calculate_ratio(testImg, i, j)
 
 
-# In[16]:
+# In[124]:
 
 
 threshold = 5
@@ -223,7 +262,7 @@ plt.show()
 
 # ### Counting the Stars
 
-# In[17]:
+# In[125]:
 
 
 def hasNeighborAbove (matrix, i, j):
@@ -241,7 +280,7 @@ def hasNeighborAbove (matrix, i, j):
         return -1
 
 
-# In[18]:
+# In[126]:
 
 
 matrix = [[False for i in range(len(testImg[0]))] for j in range(len(testImg))]
@@ -258,7 +297,7 @@ for i in range(len(imgCut)):
             matrix[i][j] = False
 
 
-# In[19]:
+# In[127]:
 
 
 print('number of stars:', count)
@@ -267,7 +306,7 @@ print('number of stars:', count)
 # ## Star Data
 # Access stars by coordinates, SNR ratio, and display them by index.
 
-# In[78]:
+# In[128]:
 
 
 class StarData:
@@ -345,7 +384,7 @@ class StarData:
 # ### Isolating Stars
 # Code and helper function to get a list of all the stars, and index contains a list of the coordinates of the star.
 
-# In[21]:
+# In[129]:
 
 
 def getStar (matrix, i, j):
@@ -373,7 +412,7 @@ def getStar (matrix, i, j):
     return [star, visited]
 
 
-# In[22]:
+# In[130]:
 
 
 stars = []
@@ -386,7 +425,7 @@ for i in range(1, len(matrix)):
             visited += v
 
 
-# In[79]:
+# In[131]:
 
 
 starList = StarData(stars)
@@ -395,7 +434,7 @@ starList = StarData(stars)
 # ### Getting Data for a Star
 # Gets event data for a star based on its coordinates.
 
-# In[24]:
+# In[132]:
 
 
 def getData (star):
@@ -417,7 +456,7 @@ def getData (star):
 
 # ### Other Helper Functions
 
-# In[111]:
+# In[133]:
 
 
 ## Visualize the events of a given star
@@ -467,27 +506,25 @@ def visualizeStarTS (starData, binsize=5, xmin=632980000, xmax=633020000, window
     return binnedts
 
 
-# In[158]:
+# In[336]:
 
 
 ## Split mass of data into contiguous intervals.
 def splitInterval (starData, windowLength=5):
     starData.sort()
-    filteredIntervals = []
     intervals = []
-    interval = []
+    interval = [starData[0]]
     for i in range(1, len(starData)):
-        if (starData[i] - starData[i - 1] > windowLength * 4):
-            intervals.append(np.array(interval))
+        if (starData[i] - starData[i - 1] > windowLength):
+            if (len(interval) > 0):
+                dist = max(interval) - min(interval)
+                if (dist >= windowLength * 4 and len(interval) > windowLength * 4):
+                    intervals.append(np.array(interval))
             interval = [starData[i]]
         else:
             interval.append(starData[i])
-    for i in intervals:
-        dist = max(i) - min(i)
-        if (dist >= windowLength * 4 and len(i) > windowLength * 4):
-            filteredIntervals.append(i)
     
-    return filteredIntervals
+    return intervals
 
 
 # ### Calculating SNR Ratio
@@ -497,7 +534,7 @@ def splitInterval (starData, windowLength=5):
 # 
 # Guaranteed: beginning of signal window timestamp is inside the sorted star data
 
-# In[25]:
+# In[286]:
 
 
 def calculateRatio (signalWindow, timeStart, starData, printLog=False):
@@ -514,6 +551,8 @@ def calculateRatio (signalWindow, timeStart, starData, printLog=False):
     sig = sigRight[sigRightMask]
     
     signalCounts = len(sig)
+    if (signalCounts == 0):
+        return 0
     
     # background
     leftBgLeftMask = starData >= timeStart - bgWindow - windowDist
@@ -547,6 +586,9 @@ def calculateRatio (signalWindow, timeStart, starData, printLog=False):
     else:
         bgArea += bgWindow  
     
+    if (bgArea == 0):
+        return 0
+    
     np.divide(bgRaw, np.array([max(bgArea, 1) for _ in range(len(bgRaw))]))
     
     ## we are guaranteed signal window is within the data, so signalArea = signalWindow
@@ -576,14 +618,14 @@ def calculateRatio (signalWindow, timeStart, starData, printLog=False):
 # 
 # Outlier threshold: mean + 4 * SD
 
-# In[26]:
+# In[136]:
 
 
 def gaussian (x, a, mean, sigma):
     return a * np.exp(-((x-mean)**2)/(2*sigma**2))
 
 
-# In[105]:
+# In[137]:
 
 
 def getSignals (signalWindow, starData, printLog=False):
@@ -605,7 +647,7 @@ def getSignals (signalWindow, starData, printLog=False):
     return ratios, measuredTimestamps
 
 
-# In[122]:
+# In[138]:
 
 
 def visualizeSignals (ratios, numBins):
@@ -637,7 +679,7 @@ def visualizeSignals (ratios, numBins):
     return mean, stdev, threshold
 
 
-# In[29]:
+# In[139]:
 
 
 def getOutlierTimestamps (ratios, measuredTimestamps, threshold=5):
@@ -649,7 +691,7 @@ def getOutlierTimestamps (ratios, measuredTimestamps, threshold=5):
     return outlierTimestamps
 
 
-# In[179]:
+# In[140]:
 
 
 def unusualSignalInfo (ratios, measuredTimes, ratioEstimate, left=False):
@@ -667,7 +709,7 @@ def unusualSignalInfo (ratios, measuredTimes, ratioEstimate, left=False):
 # 
 # Output: dictionary of outlier timestamps for each signal window
 
-# In[94]:
+# In[141]:
 
 
 def analyzeStar (starData):
@@ -707,71 +749,67 @@ def analyzeStar (starData):
 
 # ## Sanity Checks
 
-# In[160]:
+# In[170]:
 
 
-starData = getData(stars[27])
+starList.getStarByCoord(700, 450, 50)
 
 
-# In[182]:
+# In[300]:
 
 
-r, mt = getSignals(10, starData['TIME'], False)
+starList.displayStar(283, mode='zoom')
 
 
-# In[188]:
+# In[301]:
+
+
+starData = getData(stars[283])
+plt.hist(starData['TIME'], bins=1000)
+plt.show()
+
+
+# In[338]:
+
+
+r, mt = getSignals(5, starData['TIME'], False)
+
+
+# In[339]:
 
 
 for i in range(len(r)):
     print(i, r[i], mt[i])
 
 
-# In[183]:
+# In[340]:
 
 
 visualizeSignals(r, 400)
 
 
-# In[185]:
+# In[341]:
 
 
-unusualSignalInfo(r, mt, 3, False)
+unusualSignalInfo(r, mt, 1, False)
 
 
-# In[163]:
+# In[337]:
 
 
 analyzeStar(starData['TIME'])
 
 
-# In[143]:
+# In[342]:
 
 
-starList.getStarByCoord(500, 400, 50)
+print('ratio', calculateRatio(5, 632996117, np.array(sorted(starData['TIME'])), True))
 
 
-# In[145]:
+# In[344]:
 
 
-starData = getData(stars[215])
-
-
-# In[144]:
-
-
-starList.displayStar(215, mode='whole')
-
-
-# In[167]:
-
-
-print('ratio', calculateRatio(7, 632996078, np.array(sorted(starData['TIME'])), True))
-
-
-# In[189]:
-
-
-print(visualizeStarTS(starData, binsize=1, windowSize=10, windowStart=632996078, point=True))
+print(visualizeStarTS(starData, binsize=1, windowSize=5, windowStart=632996117, point=True))
 
 
 # In[146]:
