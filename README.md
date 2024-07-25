@@ -13,7 +13,8 @@
 
 ## replicating this repo
 - install packages in the command line:
-- ```
+  ```
+  sudo apt install python3-matplotlib 
   sudo apt install python3-astropy
   sudo apt install python3-regions
   sudo apt install python3-photutils
@@ -25,11 +26,16 @@ you are also free to convert the notebooks to python files by yourself; type
 the following in the command line:
   ```
   sudo apt install jupyter-nbconvert
-  jupyter nbconvert --to script script notebook_name.ipynb
+  jupyter nbconvert --to script script swift_uvot_events.ipynb
   ```
-- run programs as usual
-- if using jupyter notebook, run the cells **in order**
-- necessary files are downloaded in the scripts; do not change file paths
+- (alternatively, replace the file name with any other notebook name in this repo; however they are not of great importance to the main project)
+- this saves the notebook as a python file in the current directory, which you can run with
+  ```
+  python3 swift_uvot_events.py
+  ```
+- note that many graphs and plots are being generated, and data filtering, despite running in polynomial time, is slow, thus the program is incredibly time-consuming (potentialyl several hours) 
+- if using jupyter notebook, run the cells **in order** 
+- necessary files are downloaded in the scripts; do not change file paths in the scripts
 
 ## project work: swift UVOT data
 - extracted data, counted stars
