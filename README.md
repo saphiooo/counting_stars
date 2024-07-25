@@ -8,6 +8,8 @@
 ## todo
 - fix qq plots in counting_stars_v5 (they look wonky)
 - identify astronomical event in swift UVOT data
+  - cleaned data may be buggy?
+  - edge-handling may lead to false outliers
 
 ## replicating this repo
 - install packages in the command line:
