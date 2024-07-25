@@ -29,6 +29,7 @@ the following in the command line:
   jupyter nbconvert --to script script swift_uvot_events.ipynb
   ```
 - (alternatively, replace the file name with any other notebook name in this repo; however they are not of great importance to the main project)
+- **PLEASE NOTE** that until project code is fully finished, the python version **is buggy**
 - this saves the notebook as a python file in the current directory, which you can run with
   ```
   python3 swift_uvot_events.py
