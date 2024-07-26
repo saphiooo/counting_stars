@@ -5,13 +5,21 @@
 - using data from the Swift UVOT (ultraviolet optical telescope), this project aims to analyze stars that flare in the UV to determine characteristics about their activity, such as frequency
 - this can be used to inform conclusions about potential exoplanets around them
 
+## end goal
+- a single clean python script that can take any Swift UVOT data and search for astronomical events of note
+
 ## todo
 - fix qq plots in counting_stars_v5 (they look wonky)
 - identify astronomical event in swift UVOT data
   - cleaned data may be buggy?
   - edge-handling may lead to false outliers
+  - working out outliers
 
 ## replicating this repo
+- clone the repo:
+  ```
+  git clone git@github.com:saphiooo/counting_stars.git
+  ```
 - install packages in the command line:
   ```
   sudo apt install python3-matplotlib 
@@ -34,9 +42,14 @@ the following in the command line:
   ```
   python3 swift_uvot_events.py
   ```
-- note that many graphs and plots are being generated, and data filtering, despite running in polynomial time, is slow, thus the program is incredibly time-consuming (potentialyl several hours) 
+- note that many graphs and plots are being generated, and data filtering, despite running in polynomial time, is slow, thus the program is incredibly time-consuming (potentially several hours) 
 - if using jupyter notebook, run the cells **in order** 
 - necessary files are downloaded in the scripts; do not change file paths in the scripts
+- the simple interactive visualization program can be run with
+  ```
+  python3 visualize_events.py
+  ```
+  but is slightly laggy due to large amount of data
 
 ## project work: swift UVOT data
 - extracted data, counted stars
