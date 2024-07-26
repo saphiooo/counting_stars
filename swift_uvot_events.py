@@ -936,10 +936,10 @@ visualizeSignals(r, 50)
 unusualSignalInfo(r, mt, 1.4, False)
 
 
-# In[531]:
+# In[532]:
 
 
-analyzeStar(starData)
+## analyzeStar(starData) ## BUGGY!
 
 
 # In[523]:
