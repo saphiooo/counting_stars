@@ -1,5 +1,7 @@
 # Counting Stars: a Repository
 
+* Status Mostly Written
+
 ## Flare Finder: an Algorithm to Detect Near-Ultraviolet Flares in M-dwarfs in *Swift* UVOT Event Data 
 ### Project overview
 M-dwarfs, which comprise 75% of the stellar population, are typically favorable for transiting exoplanets. They have cool effective temperatures, relatively low mass, and strong magnetic fields relative to their size. In addition, their stellar flares are observable across the EM spectrum from gamma rays to radio waves, and characterizing these flares is a key step in determining habitability of transiting exoplanets, especially in the UV ([Paudel et al.](https://arxiv.org/abs/2404.12310)).
@@ -46,6 +48,10 @@ as the event data URL, and
 as the image data URL for a demonstration.
 
 From there, the program will run on its own. Despite running in polynomial time, the data filtering and iteration over data will take some time. Take a coffee break.
+
+### Using Other Functions
+There are other functions included in the main python script that are not called, or can be called outside of automated processs.
+***CONTENT TO BE ADDED***
 
 ### Other Scripts in the Repository
 Some other jupyter notebooks and python scripts are included in the repository that detail earlier stages of the Flare Finder. You are welcome to experiment with them, though they mostly follow online tutorials and contain some of my own experimentation.
