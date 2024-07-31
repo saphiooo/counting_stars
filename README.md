@@ -59,17 +59,9 @@ Then enter the repository with
   ```
 and run the main Python file with
   ```
-  python3 analyze_swift_uvot_events.py
+  python3 analyze_swift_uvot_events.py https://www.swift.ac.uk/archive/reproc/00094137009/uvot/event/sw00094137009um2w1po_uf.evt.gz https://www.swift.ac.uk/archive/reproc/00094137009/uvot/products/sw00094137009u_sk.img.gz
   ```
-The program will prompt for links to Swift UVOT data. You may paste in your own, or use
-  ```
-  https://www.swift.ac.uk/archive/reproc/00094137009/uvot/event/sw00094137009um2w1po_uf.evt.gz
-  ```
-as the event data URL, and
-  ```
-  https://www.swift.ac.uk/archive/reproc/00094137009/uvot/products/sw00094137009u_sk.img.gz
-  ```
-as the image data URL for a demonstration.
+Alternatively, you may run the program on your own data. The first link should be to *Swift* UVOT event data, and the second should be to UVOT image data.
 
 From there, the program will run on its own. Despite running in polynomial time, the data filtering and iteration over data will take some time. Take a coffee break.
 
