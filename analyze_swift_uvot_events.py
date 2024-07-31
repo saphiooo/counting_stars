@@ -31,6 +31,7 @@ import numpy as np
 import math
 import wget
 import sys
+import pandas as pd
 
 ## Get input from user
 
@@ -417,7 +418,7 @@ def binStarData (starData, timeStamps=True):
 ## Parameters: binsize (seconds), xmin/xmax (restrict domain), windowStart/Size (for displaying a certain ratio window)
 ## customLim must be True if xmin/xmax are specified
 
-def visualizeStarTS (starNum, starData, xmin=632980000, xmax=633020000, windowStart=-1, windowSize=-1, customLim=False, point=False):
+def visualizeStarTS (starRA, starDec, starData, xmin=632980000, xmax=633020000, windowStart=-1, windowSize=-1, customLim=False, point=False):
     
     if (point):
         plt.plot(starData.time_bin_start.gps, starData['num_events'], 'b.')
@@ -442,11 +443,11 @@ def visualizeStarTS (starNum, starData, xmin=632980000, xmax=633020000, windowSt
         plt.axvspan(windowStart + windowSize + windowDist, windowStart + windowSize + windowDist + bgWindow, 
                     color='r', alpha=0.5, lw=0)
 
-    fname = str(starNum) + '_' + str(windowSize) + '_t' + str(windowStart) + '_visualizeStarTS.png'
+    fname = 'star_at_RA_' + str(starRA) + ' ' + '_dec_' + str(starDec) + '_window_' + str(windowSize) + '_ts_' + str(windowStart) + '_visualizeStarTS.png'
 
     plt.xlabel('Time (s)')
     plt.ylabel('Photon Rate (counts/s)')
-    plt.title('TimeSeries of Photons')
+    plt.title('TimeSeries of Photon Rate for Star at ' + str(starRA) + ', ' + str(starDec) + ' (RA, Dec)')
     
     plt.savefig(fname)
     
@@ -641,17 +642,19 @@ def unusualSignalInfo (ratios, measuredTimes, ratioEstimate):
 ## input: star data
 ## output: creates visual plot of timeseries for outlier SNR ratios
 
-def analyzeStar (starNum, starData):
-    for i in [5, 10]:
+def analyzeStar (starRA, starDec, starData, windows):
+    outliers = []
+    for i in windows:
         ratios, measuredTimestamps = getSignals(i, starData)
         mean, stdev, threshold = calculateFit(ratios, 100) 
         
         ## getting outliers
-        outliers = getOutlierTimestamps(ratios, measuredTimestamps, threshold)
-        for [mt, r] in outliers:
-            print('Candidate data point for star', starNum, 'with ratio', r, 'at time', mt)
-            visualizeStarTS(starNum, starData, windowSize=i, windowStart=mt, point=False)
-    return
+        outliers_detected = getOutlierTimestamps(ratios, measuredTimestamps, threshold)
+        outliers.append(outliers_detected)
+        for [mt, r] in outliers_detected:
+            print('Candidate data point for star at ', str(starRA), ', ' + str(starDec) + ' (RA, Dec) with ratio', r, 'at time', mt)
+            visualizeStarTS(starRA, starDec, starData, windowSize=i, windowStart=mt, point=False)
+    return outliers
 
 
 ## Iterating over Stars
@@ -660,12 +663,31 @@ def analyzeStar (starNum, starData):
 print('Analyzing stars...')
 print('This will take a while, so go take a coffee break. A long one.')
 
+headings = [('Star RA (degrees)', '>f4'), ('Star Dec (degrees)', '>f4'), ('Window Size (s)', '>i2',), ('Timestamp (s)', '>f8'), ('SNR', '>f4')]
+candidates = []
+
 for i in range(len(stars)):
     starData = getData(stars[i])
+
+    [starX, starY] = np.mean(stars[i], axis=0)
+
+    starWCS = wcs.pixel_to_world(starX, starY).to_string().split(' ')
+    starRA = starWCS[0]
+    starDec = starWCS[1]
+
+    windows = [5, 10]
+    
     if (len(starData) >= 3000):
         starTimes = starData['TIME']
-
         ## bin star data
         binnedStarData = binStarData(starTimes)
         
-        analyzeStar(i, binnedStarData)
+        outliers = analyzeStar(starRA, starDec, binnedStarData, windows)
+
+        for j in range(len(outliers)):
+            for [mt, r] in outliers[j]:
+                candidates.append((starRA, starDec, windows[j], mt, r))
+
+flareCandidates = np.array(candidates, dtype=headings)
+df = pd.DataFrame(flareCandidates)
+df.to_csv('flare_candidates.csv', sep=',')
