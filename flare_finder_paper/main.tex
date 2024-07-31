@@ -57,7 +57,7 @@ The UVOT saves data in three modes, one of which is Event mode. Event mode saves
 
 \subsection{Flare Finder Algorithm}
 
-The Flare Finder algorithm first cleans data for quality and contiguity. Events with a nonzero quality flag are removed, as well as events at timestamps with few other observations. The remaining data is processed for star detection, then flare detection. The program was first written using Jupyter notebook software and later converted to a single Python file (\cite{jupyter}).
+The Flare Finder algorithm first cleans data for quality and contiguity. Events with a nonzero quality flag are removed, as well as events at timestamps with few other observations. The remaining data is processed for star detection, then flare detection. The program was first written using Jupyter notebook software and later converted to a single Python file.
 
 \subsubsection{Star Detection} \label{sss:starDetect}
 
@@ -114,7 +114,7 @@ The algorithm for flare detection uses a nested iterative process to search for 
 
 \noindent\makebox[\linewidth]{\rule{\columnwidth}{0.4pt}}
 
-All in all, there are three for loops to iterate over the star, the length of the time window, and the timestamp in the star data. For each star, the raw data from the UVOT event list is gathered, sorted, and binned into an Astropy TimeSeries with a bin size of one second. That is, all timestamps within the same second will be summed into one bin containing the total number of photon events for that second. The program then iterates over different signal window sizes to accommodate for flares of different lengths, and calculates the SNR for each window of time in the TimeSeries. 
+All in all, there are three for-loops to iterate over the star, the length of the time window, and the timestamp in the star data. For each star, the raw data from the UVOT event list is gathered, sorted, and binned into an Astropy TimeSeries with a bin size of one second. That is, all timestamps within the same second will be summed into one bin containing the total number of photon events for that second. The program then iterates over different signal window sizes to accommodate for flares of different lengths. For each time window size, the window slides along the entirety of the binned star data, shifting over by one second for each calculation.
 
 The SNR calculation over the time domain is relatively similar to the calculation for images, but with some noticeable changes. Rather than an annulus and circle, there is a signal window of length \(L_s\), and two background windows to the left and right of that window, with lengths \(L_{bg} = 1.5 \times L_s\). 
 
@@ -172,18 +172,18 @@ Using the star detection algorithm detailed in Section \ref{sss:starDetect}, the
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{imgSNR.png}
+    \includegraphics[width=\textwidth]{cut_snr_comparison.png}
     \caption{Star data after SNR ratios are calculated. Left: Visualization of SNR ratios of each point on the image. Right: Visualization of all points with SNRs above 5-standard-deviation threshold.}
     \label{img:imgSNR}
 \end{figure}
 
 \begin{multicols}{2}
 
-Noticeably, as seen in Figure \ref{img:imgSNR}, on the left, the calculated SNRs of the background are nonzero. Due to limb darkening, the brighter region of each star on the left  is larger than the threshold-cut points on the right. 
+%Noticeably, as seen in Figure \ref{img:imgSNR}, on the left, the calculated SNRs of the background are nonzero. Due to the threshold, the brighter region of each star on the left  is larger than the threshold-cut points on the right. 
 
 To test the Flare Finding algorithm on individual stars, two relatively large and bright stars were selected and analyzed for flares. From this point, the star in Figure 4 will be referred to as star A, and the star in Figure 5 will be referred to as star B.
 
-For both stars, histograms of calculated SNR ratios for time windows of 10 seconds were also generated.
+For both stars, histograms of calculated SNR ratios for time windows of 10 seconds were also generated (Figures \ref{img:histA} and \ref{img:histB}).
 
 \end{multicols}
 
@@ -284,9 +284,9 @@ To reduce bias in NUV data for observed flares in M-dwarfs, Flare Finder is an a
 Several small but persistent issues remain at hand, including noise distinction, the time window heuristic, and the SNR calculation over the time domain.
 \begin{itemize}
 
-\item \textbf{Noise distinction.} The current version of Flare Finder does not deal with high spikes of noise, as seen (potentially) in Figure \ref{img:zoomA}, and could mistake them as very short flares. 
+\item \textbf{Noise distinction.} Flare Finder does not detect non-Gaussian-distributed noise, as the SNR calculation relies on the assumption that the noise is Gaussian-distributed. If a high energy particle directly impacts a defective pixel, resulting in high values of noise, Flare Finder cannot distinguish the noise from a short flare. 
 
-\item  \textbf{Time window heuristic.} Flare Finder relies on an estimation for the length of the flare (e.g. 10 seconds), or several estimations (5 \textit{and} 10 seconds) to decrease processing time. This causes longer- or shorter-lasting flares to be ignored (e.g. in Figures \ref{img:zoomA} and 11). Optimizing the calculation process, or potentially using machine learning to choose better lengths for the time window, will increase Flare Finder's accuracy.
+\item \textbf{Time window heuristic.} Flare Finder relies on an estimation for the length of the flare (e.g. 10 seconds), or several estimations (5 \textit{and} 10 seconds) to decrease processing time. This causes longer- or shorter-lasting flares to be ignored (e.g. in Figures \ref{img:zoomA} and 11). Optimizing the calculation process will increase Flare Finder's accuracy and allow for more time windows to be analyzed.
 
 \item \textbf{SNR calculation.} By definition, the standard deviation of the distribution of SNRs for each star should be 1. However, when analyzing the data, it consistently measured a standard deviation of about 0.5, indicating something in the calculation process may be systematically affecting the SNR.
 
