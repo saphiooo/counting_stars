@@ -6,7 +6,31 @@
 ### Project overview
 M-dwarfs, which comprise 75% of the stellar population, are typically favorable for transiting exoplanets. They have cool effective temperatures, relatively low mass, and strong magnetic fields relative to their size. In addition, their stellar flares are observable across the EM spectrum from gamma rays to radio waves, and characterizing these flares is a key step in determining habitability of transiting exoplanets, especially in the UV ([Paudel et al.](https://arxiv.org/abs/2404.12310)).
 
-However, to this point, flares are typically first detected in the optical wavelength, and then other telescopes are pointed at the source to measure the flare in other wavelengths, and only 28% of flares detectable in the NUV are not detectable optically. Flare Finder aims to detect flares in any inputted Swift UVOT data, without the need for optical data, reducing bias in observed flares. 
+However, to this point, flares are typically first detected in the optical wavelength, and then other telescopes are pointed at the source to measure the flare in other wavelengths, and only 28% of flares detectable in the NUV are not detectable optically. Flare Finder aims to detect flares in any inputted Swift UVOT data, without the need for optical data, reducing bias in observed flares.
+
+You can read my paper by following these steps:
+
+First, clone the repo with
+  ```
+  git clone git@github.com:saphiooo/counting_stars.git
+  ```
+Install necessary packages:
+  ```
+  sudo apt-get update -y
+  sudo apt-get install texlive
+  sudo apt-get install -y texlive-science
+  sudo apt-get install texlive-bibtex-extra biber
+  ```
+Then run the command
+  ```
+  biber main
+  ```
+Compile and view the document with
+  ```
+  pdflatex -interaction=nonstopmode main.tex
+  evince main.pdf
+  ```
+If an error occurs with the references/bibliography, you may have to rerun `biber main`.
 
 ### Known Issues/Future Improvement
 Known areas of improvement include:
