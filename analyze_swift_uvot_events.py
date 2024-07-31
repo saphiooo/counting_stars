@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Analyze Swift UVOT Events
-# 
-# A program that takes any Swift UVOT data, cleans it for quality, and outputs potential candidates that flare in the UV.
+# Analyze Swift UVOT Events
+## A program that takes any Swift UVOT data, cleans it for quality, and outputs
+## potential candidates that flare in the UV.
 
-# ## Reading in Data
-# 
-# Import the necessary packages, download files, and clean the data.
+###########################################################################
 
-# In[3]:
-
+# Reading in Data
+## Import the necessary packages, download files, and clean the data
 
 from astropy.io import fits
 from astropy.wcs import WCS
@@ -29,35 +27,29 @@ from scipy.optimize import curve_fit
 from PIL import Image
 
 import matplotlib.pyplot as plt
-get_ipython().run_line_magic('matplotlib', 'inline')
 import numpy as np
 import math
 import wget
 import sys
 
+## Get input from user
 
-# In[955]:
+print('Beginning program "analyze swift uvot events" to analyze for astronomical')
+print('events in swift uvot data')
 
+# eventDataUrl = input('URL for swift uvot event data: ')
+# imgDataUrl = input('URL for swift uvot image data: ')
 
-# ## getting input from the user
+eventDataUrl = sys.argv[1]
+imgDataUrl = sys.argv[2]
 
-# print('beginning program "swift uvot events" to analyze for astronomical events in swift uvot data')
-
-# eventDataUrl = input('url for swift uvot event data: ')
-
-# imgDataUrl = input('url for swift uvot image data: ')
-
-
-# In[5]:
-
-
-## download the files locally
+## Download the files locally
 
 print('Downloading data...')
 
-# test data
-eventDataUrl = 'https://www.swift.ac.uk/archive/reproc/00094137009/uvot/event/sw00094137009um2w1po_uf.evt.gz'
-imgDataUrl = 'https://www.swift.ac.uk/archive/reproc/00094137009/uvot/products/sw00094137009u_sk.img.gz'
+## Test data
+# eventDataUrl = 'https://www.swift.ac.uk/archive/reproc/00094137009/uvot/event/sw00094137009um2w1po_uf.evt.gz'
+# imgDataUrl = 'https://www.swift.ac.uk/archive/reproc/00094137009/uvot/products/sw00094137009u_sk.img.gz'
 
 eventPath = 'swift_event_data.evt.gz'
 imgPath = 'swift_img_data.img.gz'
@@ -71,16 +63,13 @@ except:
     print('Error downloading files')
     sys.exit(1)
 
+## Open files after downloading them locally
 
-# In[6]:
+eventFile = fits.open('swift_event_data.evt.gz')
+imgFile = fits.open('swift_img_data.img.gz')
 
-
-## open files after downloading them locally
-# eventFile = fits.open('swift_event_data.evt.gz')
-# imgFile = fits.open('swift_img_data.img.gz')
-
-eventFile = fits.open('sw00094137009um2w1po_uf.evt.gz')
-imgFile = fits.open('sw00094137009u_sk.img.gz')
+## eventFile = fits.open('sw00094137009um2w1po_uf.evt.gz')
+## imgFile = fits.open('sw00094137009u_sk.img.gz')
 
 primaryHdu = imgFile[0]
 imgHdu = imgFile[1]
@@ -89,22 +78,17 @@ wcs = WCS(imgHdu.header)
 
 events = eventFile[1].data
 
+###########################################################################
 
-# ### Cleaning Event Data
+# Cleaning Event Data
 
-# In[9]:
+## Removing events where the quality is not good, as marked by the telescope
 
-
-## removing events where the quality is not good, as marked by the telescope
 print('Cleaning data...')
 events_good = events[np.where((events.QUALITY == 0))]
 print(f'Removed {len(events) - len(events_good)} events')
 
-
-# In[14]:
-
-
-## removing non-continuous data points (or floating chunks of data)
+## Removing non-continuous data points (or floating chunks of data)
 
 print('Removing non-continuous data points...')
 
@@ -140,30 +124,16 @@ if (waiting_interval[-1][0] - waiting_interval[0][0] > 80):
 ## return cleaned events with same formats as original data
 events_clean = np.array(events_int, dtype=formats)
 
-
-# In[15]:
-
-
-## convert events to numpy record array
+## Convert events to numpy record array
 
 events_clean = events_clean.view(np.recarray)
 print('Removed', len(events_good) - len(events_clean), 'events')
 
+###########################################################################
 
-# In[631]:
+# Displaying Event Data
 
-
-## an interval used for debugging purposes
-
-## middleInterval = events_clean[np.where((events_clean['TIME'] < 633003000) & (events_clean['TIME'] > 633000000))]
-
-
-# ## Displaying Event Data
-
-# In[954]:
-
-
-## displays all the data on a 2D histogram
+## Displays all the data on a 2D histogram, and saves it
 
 print('Generating visualization of data...')
 
@@ -174,25 +144,19 @@ plt.subplot(projection=wcs)
 histdata, x_bins, y_bins, img = plt.hist2d(events_clean.X, events_clean.Y, bins=1000, vmin=0, vmax=200)
 plt.colorbar()
 plt.savefig('swift_event_data_visualization.png')
+plt.show()
 
+###########################################################################
 
-# ## Star-finding
-# 
-# finding stars so their data can be organized
+# Star-finding
+## Finding stars so their data can be organized
 
-# In[18]:
-
-
-## import annulus
-## these stars are smaller, so we use the smaller annulus
+## Import an annulus aperture
+## These stars are smaller, so we use a smaller annulus
 
 print('Identifying stars...')
 
 im_frame = Image.open('annuli_imgs/annulus_22.png')
-
-
-# In[19]:
-
 
 ## fix up the imported annulus so that it's a 2D numpy array
 
@@ -208,18 +172,8 @@ for i in range(annulus_size):
         ## star (circle aperture)
         elif (np_frame[i, j, 0] == 112):
             annulus[i, j] = 2
-            
-plt.imshow(annulus, cmap='gray')
-plt.colorbar()
-plt.show()
-
-
+ 
 # ### Signal to Noise Ratio
-
-# In[957]:
-
-
-## signal-to-noise ratio function from counting_stars_v5
 
 def calcStarRatio (testImg, x, y):
     ## summing counts
@@ -258,11 +212,7 @@ def calcStarRatio (testImg, x, y):
     
     return signal/total_noise
 
-
-# In[958]:
-
-
-## calculating SNR for every single pixel on the image
+## Calculating SNR for every single pixel on the image
 testImg = histdata
 
 snrImg = np.zeros(testImg.shape)
@@ -272,13 +222,10 @@ for i in range(-offset, len(testImg) - offset):
         snrImg[i + offset, j + offset] = calcStarRatio(testImg, i, j)
 
 
-# In[959]:
-
-
-## set a basic threshold for the SNR
+## Set a basic threshold for the SNR
 threshold = 5
 
-## apply threshold on snrImg
+## Apply threshold on snrImg
 imgCut = np.zeros(snrImg.shape)
 
 for i in range(len(snrImg)):
@@ -288,20 +235,11 @@ for i in range(len(snrImg)):
         else:
             imgCut[i, j] = 0
 
-## display the isolated stars 
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10,4))
-axes[0].imshow(testImg, cmap='gray', vmin=0, vmax=100)
-axes[1].imshow(imgCut, cmap='gray')
-print('Saving image of identified stars...')
-plt.savefig('swift_data_identified_stars.png')
+###########################################################################
 
+# Identifying Stars
 
-# ### Counting the Stars
-
-# In[960]:
-
-
-## a simple function that returns if a pixel that's part of a star has a neighbor above and to the left of it
+## A simple function that returns if a pixel that's part of a star has a neighbor above and to the left of it
 
 def hasNeighborAbove (matrix, i, j):
     try:
@@ -317,15 +255,9 @@ def hasNeighborAbove (matrix, i, j):
     except:
         return -1
 
-
-# In[961]:
-
-
-## a matrix of T/F values for if there is a star at position i,j, where i,j corresponds to its position in testImg.
-
 matrix = [[False for i in range(len(testImg[0]))] for j in range(len(testImg))]
 
-## counting the total number of stars
+## Counting the total number of stars
 count = 0
 
 for i in range(len(imgCut)):
@@ -337,18 +269,11 @@ for i in range(len(imgCut)):
         else:
             matrix[i][j] = False
 
-
-# In[962]:
-
-
 print('Number of stars detected:', count)
 
 
-# ## Star Data
-# Access stars by coordinates, SNR ratio, and display them by index.
-
-# In[28]:
-
+## Star Data
+## Access stars by coordinates, SNR ratio, and display them by index.
 
 class StarData:
     stars = []
@@ -407,32 +332,13 @@ class StarData:
             plt.gca().add_patch(starCircle)
         plt.show()
 
+###########################################################################
 
-# ## Finding the Changing Event
-# 
-# 1) Isolate all the coordinates of individual stars.
-# 
-# 2) For each star:
-#     
-#     a) Get the star data
-#     
-#     b) For each possible size of a signal window:
-#         
-#         i) For each possible window in the star data:
-#         
-#             Calculate the SNR ratio
-#             
-#         ii) Return all timestamps with an outlier SNR ratio
-#         
-#     c) Return all signal windows with outlier timestamps
+# Finding the Changing Event
 
-# ### Isolating Stars
-# Code and helper function to get a list of all the stars, and index contains a list of the coordinates of the star.
+# Isolating Stars
 
-# In[29]:
-
-
-## gets all the coordinates for a single star using a floodfill algorithm
+## Gets all the coordinates for a single star using a floodfill algorithm
 
 def getStar (matrix, i, j):
     ## initial star pixel has coords (i, j)
@@ -459,11 +365,7 @@ def getStar (matrix, i, j):
     ## return visited coordinates and all the star coordinates
     return [star, visited]
 
-
-# In[373]:
-
-
-## get a list of all the stars, which will be used in the next cell to make the total star list (object)
+## Get a list of all the stars, which will be used in the next cell to make the total star list (object)
 
 print('Saving star information...')
 
@@ -476,25 +378,14 @@ for i in range(1, len(matrix)):
             stars.append(star)
             visited += v
 
-
-# In[374]:
-
-
-## total list of all the stars
+## Total list of all the stars
 
 starList = StarData(stars)
 
-
-# ### Getting Data for a Star
-
-# In[442]:
-
-
-## gets event data for a star based on its coordinates
+## Getting Data for a Star
+## Gets event data for a star based on its coordinates
 
 def getData (star):
-    print('Getting star data...')
-    
     starData = []
     for [s1, s2] in star:
         mask1 = events_clean['X'] >= x_bins[s1]
@@ -510,19 +401,9 @@ def getData (star):
         
     return np.array([d for ls in starData for d in ls])
 
-
-# In[85]:
-
-
-## timeStamps = True if starData only contains times
-## timeStamps = False if starData is actually the list of all the involved event data
-
 def binStarData (starData, timeStamps=True):
-    
     times = [Time(t, format='gps') for t in starData]
-    
     ts = TimeSeries(time=times)
-    
     ts['num_events'] = [1 for _ in range(len(ts))]
     
     binnedts = aggregate_downsample(ts, time_bin_size=1 * u.second, aggregate_func=np.sum)
@@ -530,18 +411,13 @@ def binStarData (starData, timeStamps=True):
     return binnedts
 
 
-# ### Other Helper Functions
+## Other Helper Functions
 
-# In[651]:
-
-
-## visualize the events of a given star
-## parameters: binsize (seconds), xmin/xmax (restrict domain), windowStart/Size (for displaying a certain ratio window)
+## Visualize the events of a given star
+## Parameters: binsize (seconds), xmin/xmax (restrict domain), windowStart/Size (for displaying a certain ratio window)
 ## customLim must be True if xmin/xmax are specified
 
-## displays TS in a plot
-
-def visualizeStarTS (starData, xmin=632980000, xmax=633020000, windowStart=-1, windowSize=-1, customLim=False, point=False):
+def visualizeStarTS (starNum, starData, xmin=632980000, xmax=633020000, windowStart=-1, windowSize=-1, customLim=False, point=False):
     
     if (point):
         plt.plot(starData.time_bin_start.gps, starData['num_events'], 'b.')
@@ -565,73 +441,25 @@ def visualizeStarTS (starData, xmin=632980000, xmax=633020000, windowStart=-1, w
         plt.axvspan(windowStart - windowDist - bgWindow, windowStart - windowDist, color='r', alpha=0.5, lw=0)
         plt.axvspan(windowStart + windowSize + windowDist, windowStart + windowSize + windowDist + bgWindow, 
                     color='r', alpha=0.5, lw=0)
-        
-    plt.show()
+
+    fname = str(starNum) + '_' + str(windowSize) + '_t' + str(windowStart) + '_visualizeStarTS.png'
+
+    plt.xlabel('Time (s)')
+    plt.ylabel('Photon Rate (counts/s)')
+    plt.title('TimeSeries of Photons')
+    
+    plt.savefig(fname)
     
     bounds = np.where((starData['time_bin_start'].value >= xmin) & (starData['time_bin_start'].value <= xmax))
+
+    plt.show()
     
     return starData[bounds]
 
-
-# In[527]:
-
-
-## split mass of data into contiguous intervals
-## returns list of [i, j] where starData[i] is the beginning of the interval and starData[j] is the end
-
-## FUNCTION IS NO LONGER IN USE AS OF 7.25.24
-
-def splitInterval (starData, windowLength=5):
-    intervals = []
-    intLeft = 0
-    intRight = 0
-    for i in range(1, len(starData)):
-        if (type(starData[i]['num_events']) == np.ma.core.MaskedConstant):
-            if (intRight - intLeft > 0):
-                dist = (starData['time_bin_start'][intRight].value - starData['time_bin_start'][intLeft].value) #* (24 * 3600)
-                if (dist >= windowLength * 3.5):
-                    intervals.append([intLeft, intRight])
-            intLeft = i
-            intRight = i
-        else:
-            intRight = i
-            
-    ## dealing with fencepost error
-    dist = starData['time_bin_start'][intRight].value - starData['time_bin_start'][intLeft].value
-    if (dist >= windowLength * 3.5 and 
-        len(starData['time_bin_start'][intLeft : intRight + 1]) > windowLength * 3.5):
-        intervals.append([intLeft, intRight])
-    
-    return intervals
-
-
-# In[156]:
-
-
-## returns the max window size that can be analyzed when calculating ratios, avoiding high outliers
-
-## FUNCTION NO LONGER IN USE AS OF 07.26.2024
-
-def getMaxWindow (starData):
-    try:
-        ints = splitInterval(starData, 5)
-        mins = [min(1000000, starData[ints[i][1]]['time_bin_start'].value - starData[ints[i][0]]['time_bin_start'].value) for i in range(len(ints))]
-        return int(max(mins) / 4)
-    except:
-        return 0
-
-
-# ### Calculating SNR Ratio
-# Input: window size, beginning of signal window timestamp, sorted star data
-# 
-# Output: signal to noise ratio
-# 
-# Guaranteed: beginning of signal window timestamp is inside the sorted star data
-
-# In[604]:
-
-
-## calculates the signal-to-noise ratio for a given interval
+## Calculating SNR Ratio
+## Input: window size, beginning of signal window timestamp, sorted star data
+## Output: signal to noise ratio
+## Calculates the signal-to-noise ratio for a given interval
 
 def calculateRatio (signalWindow, timeStart, starData, printLog=False):
     ## calculate background window size
@@ -686,25 +514,16 @@ def calculateRatio (signalWindow, timeStart, starData, printLog=False):
         
     return signalRate/totalNoiseRate
 
-
-# ### Finding Interesting Signals for Each Star
+## Finding Interesting Signals for Each Star
 # Input: signal window, sorted star event data
-# 
 # Output: list of S/N ratios, measured timestamps
 # 
-# Outlier threshold: mean + 4 * SD
-
-# In[410]:
-
+# Outlier threshold: mean + 5 * SD
 
 ## define a gaussian distribution function for fitting purposes
 
 def gaussian (x, a, mean, sigma):
     return a * np.exp(-((x-mean)**2)/(2*sigma**2))
-
-
-# In[629]:
-
 
 ## get all the signal-to-noise ratios for a star, with a certain signal window
 
@@ -721,10 +540,6 @@ def getSignals (signalWindow, starData, printLog=False):
     
     ## returns the SNRs and all their timestamps, where ratios[i] corresponds to measuredTimestamps[i]
     return ratios, measuredTimestamps
-
-
-# In[667]:
-
 
 ## visualizes the SNRs in a histogram
 
@@ -754,14 +569,15 @@ def visualizeSignals (ratios, numBins):
         mean = np.mean(ratios)
         stdev = np.std(ratios)
         threshold = mean + 5 * stdev
-    
+
+    plt.xlabel('SNR')
+    plt.ylabel('Frequency')
+
+    plt.title('Distribution of SNRs')
+        
     plt.show()
     
     return mean, abs(stdev), threshold
-
-
-# In[1]:
-
 
 ## calculates the fit of a normal curve without visualizing the histogram
 
@@ -780,7 +596,6 @@ def calculateFit (ratios, numBins):
         ## fit parameters
 
         amp, mean, stdev = popt
-        print('amp', amp, 'mean', mean, 'stdev', stdev)
 
         threshold = mean + 5 * abs(stdev)
         plt.axvline(x=threshold, c='g', linewidth=1)
@@ -794,33 +609,24 @@ def calculateFit (ratios, numBins):
     
     return mean, abs(stdev), threshold
 
-
-# In[40]:
-
-
 ## gets all the timestamps where the SNR is an outlier
 
 def getOutlierTimestamps (ratios, measuredTimestamps, threshold=3):
     outlierTimestamps = []
+    outputOutliers = []
     for i in range(len(ratios)):
         if (ratios[i] > threshold):
-            outlierTimestamps.append([measuredTimestamps[i], ratio])
-            
-    outputOutliers = [outlierTimestamps[0]]
-    for i in range(1, len(outlierTimestamps)):
-        if (abs(outlierTimestamps[i][0] - outlierTimestamps[i - 1][0]) > 3):
-            ## they are probably not part of the same flare
-            outputOutliers.append(outlierTimestamps[i])
+            outlierTimestamps.append([measuredTimestamps[i], ratios[i]])
+    if (len(outlierTimestamps) > 0):        
+        outputOutliers = [outlierTimestamps[0]]
+        for i in range(1, len(outlierTimestamps)):
+            if (abs(outlierTimestamps[i][0] - outlierTimestamps[i - 1][0]) > 3):
+                ## they are probably not part of the same flare
+                outputOutliers.append(outlierTimestamps[i])
             
     return outputOutliers
 
-
-# In[41]:
-
-
 ## gets the relevant info about a certain SNR
-## input ratios and measured times
-## returns all relevant timestamps with ratio toward the positive extreme
 
 def unusualSignalInfo (ratios, measuredTimes, ratioEstimate):
     for i in range(len(ratios)):
@@ -829,18 +635,13 @@ def unusualSignalInfo (ratios, measuredTimes, ratioEstimate):
     return
 
 
-# ### Iterating over Signal Window Size
-
-# In[2]:
-
+## Iterating over Signal Window Size
 
 ## iterates over different signal window sizes for a given star
 ## input: star data
 ## output: creates visual plot of timeseries for outlier SNR ratios
 
-def analyzeStar (starData):
-    
-    ## for i in range(minWindow, maxWindow):
+def analyzeStar (starNum, starData):
     for i in [5, 10]:
         ratios, measuredTimestamps = getSignals(i, starData)
         mean, stdev, threshold = calculateFit(ratios, 100) 
@@ -848,18 +649,12 @@ def analyzeStar (starData):
         ## getting outliers
         outliers = getOutlierTimestamps(ratios, measuredTimestamps, threshold)
         for [mt, r] in outliers:
-            print('Candidate data point with ratio', r, 'at', mt)
-            visualizeStarTS(starData, windowSize=i, windowStart=mt, point=False)
-        
-    
+            print('Candidate data point for star', starNum, 'with ratio', r, 'at time', mt)
+            visualizeStarTS(starNum, starData, windowSize=i, windowStart=mt, point=False)
     return
 
 
-# ### Iterating over Stars
-
-# In[668]:
-
-
+## Iterating over Stars
 ## getting stars with substantial data
 
 print('Analyzing stars...')
@@ -873,5 +668,4 @@ for i in range(len(stars)):
         ## bin star data
         binnedStarData = binStarData(starTimes)
         
-        analyzeStar(binnedStarData)
-
+        analyzeStar(i, binnedStarData)
