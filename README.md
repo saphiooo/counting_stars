@@ -1,12 +1,12 @@
 # Counting Stars: a Repository
 
-* Status Mostly Written
+* Status: Content Mostly Written
 
 ## Flare Finder: an Algorithm to Detect Near-Ultraviolet Flares in M-dwarfs in *Swift* UVOT Event Data 
 ### Project overview
 M-dwarfs, which comprise 75% of the stellar population, are typically favorable for transiting exoplanets. They have cool effective temperatures, relatively low mass, and strong magnetic fields relative to their size. In addition, their stellar flares are observable across the EM spectrum from gamma rays to radio waves, and characterizing these flares is a key step in determining habitability of transiting exoplanets, especially in the UV ([Paudel et al.](https://arxiv.org/abs/2404.12310)).
 
-However, to this point, flares are typically first detected in the optical wavelength, and then other telescopes are pointed at the source to measure the flare in other wavelengths. This creates bias in the sample of observed flares, as flares observable in the UV can be diluted by noise in the optical wavelength. Flare Finder aims to detect flares in any inputted Swift UVOT data, without the need for optical data. 
+However, to this point, flares are typically first detected in the optical wavelength, and then other telescopes are pointed at the source to measure the flare in other wavelengths, and only 28% of flares detectable in the NUV are not detectable optically. Flare Finder aims to detect flares in any inputted Swift UVOT data, without the need for optical data, reducing bias in observed flares. 
 
 ### Known Issues/Future Improvement
 Known areas of improvement include:
@@ -51,7 +51,13 @@ From there, the program will run on its own. Despite running in polynomial time,
 
 ### Using Other Functions
 There are other functions included in the main python script that are not called, or can be called outside of automated processs.
-***CONTENT TO BE ADDED***
+These include:
+- `visualizeStarTS()`: a method that visualizes an entire or part of a TimeSeries with certain x bounds, and marks the signal and background windows in green and red respectively.
+  - Parameters: starNum (index or star name), starData (binned Astropy TimeSeries of star data), [xmin = minimum of x axis, xmax = maximum of x axis, windowStart = timestamp start of signal window, windowSize = length of signal window, customLim = True if xmin/xmax are specified, point = True to display the TimeSeries as non-connected points]
+- `getSignals()`: get all SNRs for a star's data.
+  - Parameters: signalWindow (length of signal window), starData (binned Astropy TimeSeries of star data), [printLog = True to print statistics of each measured time window when calculating ratios]
+- `visualizeSignals()`: a method that displays a histogram of all calculated SNR ratios for a certain star, then fits a Gaussian distribution over the data (red) and marks the upper 5-standard-deviation bound.
+  - Parameters: ratios (list of SNRs by timestamp), measuredTimestamps (list of all timestamps that were measured in order). These are the output of the getSignals() function.
 
 ### Other Scripts in the Repository
 Some other jupyter notebooks and python scripts are included in the repository that detail earlier stages of the Flare Finder. You are welcome to experiment with them, though they mostly follow online tutorials and contain some of my own experimentation.
