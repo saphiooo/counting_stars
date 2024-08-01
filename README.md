@@ -33,6 +33,12 @@ Compile and view the document with
   ```
 If an error occurs with the references/bibliography, you may have to rerun `biber main`.
 
+You can open the slideshow in Libreoffice with
+  ```
+  libreoffice --writer flare_finder_slides.odp
+  ```
+which will open the presentation directly in LibreOffice Impress.
+
 ### Known Issues/Future Improvement
 Known areas of improvement include:
 - Distinguishing noise flares from real data
