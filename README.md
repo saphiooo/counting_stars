@@ -21,8 +21,9 @@ Install necessary packages:
   sudo apt-get install -y texlive-science
   sudo apt-get install texlive-bibtex-extra biber
   ```
-Then run the command
+Then run the commands
   ```
+  cd counting_stars/flare_finder_paper
   biber main
   ```
 Compile and view the document with
