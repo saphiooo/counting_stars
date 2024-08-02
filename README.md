@@ -33,11 +33,16 @@ Compile and view the document with
   ```
 If an error occurs with the references/bibliography, you may have to rerun `biber main`.
 
-You can open the slideshow in Libreoffice with
+You can convert the slideshow to a PDF with
+  ```
+  soffice --headless --convert-to pdf flare_finder_slides.odp
+  ```
+
+Alternatively, you can also open the slideshow in Libreoffice with
   ```
   libreoffice --writer flare_finder_slides.odp
   ```
-which will open the presentation directly in LibreOffice Impress.
+which will open the presentation directly in LibreOffice Impress (on Linux).
 
 ### Known Issues/Future Improvement
 Known areas of improvement include:
