@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 import numpy as np
 
-eventFile = fits.open('/home/saphio/sw00094137009um2w1po_uf.evt.gz')
-imgFile = fits.open('/home/saphio/sw00094137009u_sk.img.gz')
+eventFile = fits.open('swift_event_data.evt.gz')
+imgFile = fits.open('swift_img_data.img.gz')
 
 primaryHdu = imgFile[0]
 imgHdu = imgFile[1]
